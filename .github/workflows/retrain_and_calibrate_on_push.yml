@@ -1,0 +1,55 @@
+name: Retrain and Calibrate on Push
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 2 * * *'  # 02:00 UTC nightly
+  workflow_dispatch:
+
+jobs:
+  retrain_calibrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare timestamp and folders
+        shell: bash
+        run: |
+          set -e
+          echo "TIMESTAMP=$(date '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
+          mkdir -p models metrics
+
+      - name: Train and calibrate model
+        run: |
+          python ./src/train_model.py --timestamp "$TIMESTAMP"
+
+      # Evaluation is triggered inside train_model.py (no separate step)
+
+      - name: Commit and push models and metrics
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          git config user.email "actions@github.com"
+          git config user.name "github-actions"
+          git add models/*${TIMESTAMP}* metrics/${TIMESTAMP}_evaluation.json metrics/${TIMESTAMP}_calibration.json || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "CI: retrain and calibrate model ${TIMESTAMP}"
+            git push
+          fi
