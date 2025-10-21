@@ -109,3 +109,32 @@ Artifacts committed by CI:
 - Local virtual environments are ignored by `.gitignore` to avoid accidental commits.
 - Older workflow examples under `workflows/` are not active; GitHub only runs files under `.github/workflows/`.
 
+## CI/CD Diagram
+
+<div align="center">
+<div style="max-width:100%; overflow-x:auto; padding:8px; border:1px solid #e1e4e8; border-radius:6px">
+
+```mermaid
+flowchart LR
+  Dev[Code change] -->|push main| GA[GitHub Actions]
+  Night[02:00 UTC schedule] --> GA
+  Manual[Manual dispatch] --> GA
+
+  GA --> Ck[Checkout code]
+  Ck --> Py[Setup Python 3.9]
+  Py --> Deps[Install requirements]
+  Deps --> Prep[Set TIMESTAMP and create models/ metrics/]
+  Prep --> Train[Run src/train_model.py --timestamp TIMESTAMP]
+  Train -->|saves| M[models: model_TS_svc.joblib + model_TS_svc_calibrated.joblib]
+  Train -->|calls| Eval[src/evaluate_model.py]
+  Eval -->|writes| Met[metrics: TS_evaluation.json and TS_calibration.json]
+  M --> Commit[Git commit artifacts]
+  Met --> Commit
+  Commit --> Push[Push to repo]
+  Push --> Hist[Versioned artifacts on main]
+  Hist --> API[FastAPI loads latest calibrated model at runtime]
+```
+
+</div>
+</div>
+
