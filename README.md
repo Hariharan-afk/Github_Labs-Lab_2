@@ -1,12 +1,14 @@
 # Breast Cancer Classification with FastAPI and GitHub Actions
 
-This project demonstrates an end‑to‑end, minimal MLOps loop:
-- Train a binary classifier on the Breast Cancer Wisconsin Diagnostic dataset
-- Calibrate predicted probabilities for better decision‑making
-- Serve predictions via a FastAPI service
-- Automate retraining + evaluation on every push using GitHub Actions, and version artifacts in‑repo
+A production-ready MLOps pipeline demonstrating automated model training, calibration, and deployment for breast cancer classification.
 
-Watch the tutorial video for this lab at: https://youtu.be/cj5sXIMZUjQ
+This project implements an end-to-end machine learning workflow featuring:
+
+- **Binary Classification**: Distinguishes between malignant and benign breast tumors
+- **Probability Calibration**: Ensures reliable confidence scores for clinical decision-making
+- **REST API**: FastAPI service for real-time predictions
+- **Continuous Training**: Automated retraining pipeline via GitHub Actions
+- **Version Control**: All models and metrics tracked in-repository
 
 ## Dataset
 - Source: scikit‑learn `load_breast_cancer`
@@ -23,15 +25,23 @@ Watch the tutorial video for this lab at: https://youtu.be/cj5sXIMZUjQ
   - `model_<timestamp>_svc_calibrated.joblib` (calibrated model used by the API)
 
 ## Project Structure
-- `src/train_model.py` — trains base + calibrated models, then runs evaluation
-- `src/evaluate_model.py` — writes evaluation and calibration metrics JSONs
-- `src/api.py` — FastAPI app exposing `/predict`, `/samples`, `/feature_names`, `/health`
-- `src/send_sample_prediction.py` — helper to send a sample request to the API
-- `.github/workflows/retrain_and_calibrate_on_push.yml` — CI retraining workflow
-- `models/` — versioned models (committed by CI)
-- `metrics/` — JSON metrics artifacts (committed by CI)
-- `requirements.txt` — Python dependencies
-- `.gitignore` — ignores local venvs, caches, etc. (keeps models/ and metrics/ tracked)
+
+```
+.
+├── .github/
+│   └── workflows/
+│       └── retrain_and_calibrate_on_push.yml  # CI/CD pipeline
+├── src/
+│   ├── train_model.py                         # Training script
+│   ├── evaluate_model.py                      # Metrics computation
+│   ├── api.py                                 # FastAPI service
+│   └── send_sample_prediction.py              # Testing utility
+├── models/                                     # Versioned model artifacts
+├── metrics/                                    # Evaluation results (JSON)
+├── requirements.txt                            # Python dependencies
+├── .gitignore                                 # Excludes venvs, caches
+└── README.md                                  # This file
+```
 
 ## Local Usage
 Prereqs: Python 3.9+, pip, and optionally a virtual environment.
