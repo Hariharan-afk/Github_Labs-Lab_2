@@ -96,6 +96,7 @@ Workflow: `.github/workflows/retrain_and_calibrate_on_push.yml`
   - Generate a timestamp and ensure `models/` and `metrics/` exist
   - Run `src/train_model.py --timestamp $TIMESTAMP` (saves models and writes metrics)
   - Commit and push new `models/` and `metrics/` artifacts back to the repository
+- There is a scheduler to retrain the model once everyday (2:00 am default).
 
 Artifacts committed by CI:
 - `models/model_<timestamp>_svc.joblib`
