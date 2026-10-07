@@ -1,0 +1,8 @@
+{
+    "dataset": "breast_cancer",
+    "n_test": 114,
+    "accuracy_base": 0.9649122807017544,
+    "f1_base": 0.9722222222222222,
+    "accuracy_calibrated": 0.9736842105263158,
+    "f1_calibrated": 0.9795918367346939
+}
